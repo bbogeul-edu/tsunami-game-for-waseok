@@ -8,7 +8,22 @@
 
 빌드 과정이 없는 정적 사이트라서 Vercel에서 Framework Preset을 "Other"로 두고 그대로 배포하면 돼요.
 
+## 랭킹 보드 켜는 법 (Supabase)
+1. supabase.com 에서 새 프로젝트를 만들어요.
+2. 대시보드 → SQL Editor → `supabase/schema.sql` 내용을 붙여 넣고 Run.
+3. Project Settings → API 에서 Project URL 과 공개 키(anon 또는 publishable)를 복사해요.
+4. `index.html` 의 `const RANK = { url: '', key: '' }` 에 넣으면 켜져요.
+   - 공개 키는 원래 브라우저에 들어가도 되는 키예요. service_role / secret 키는 절대 넣지 마세요.
+5. 이상한 별명은 대시보드 → Table Editor → scores 에서 선생님이 지우면 돼요.
+
+점수 = 기본 1000 + 남은 하트×200 − 틀린 횟수×100 − 힌트×50 (최고 1600점)
+
 ## 버전 기록
+
+### v1.2.0
+- 엔딩에 점수와 계산 내용을 보여주고, 별명으로 랭킹에 올릴 수 있어요.
+- 랭킹 보드: 우리 반 / 전체 상위 20명. 시작 화면과 엔딩에서 볼 수 있어요.
+- 장을 다시 해도 틀린 횟수와 힌트 사용은 지워지지 않아요. (1장부터 다시 하면 새로 시작)
 
 ### v1.1.1
 - 6장 시간제한 선택을 5초에서 10초로 늘렸어요.
