@@ -68,9 +68,23 @@ button{cursor:pointer}
 #hud{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;justify-content:space-between;
   padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 12px;z-index:5;pointer-events:none}
 #hud > *{pointer-events:auto}
-#chLabel{font-family:var(--display);font-size:1.05rem;letter-spacing:.02em;background:var(--glass);border:1px solid var(--line);
+#chLabelOld{font-family:var(--display);font-size:1.05rem;letter-spacing:.02em;background:var(--glass);border:1px solid var(--line);
   padding:8px 14px;border-radius:999px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hud-right{display:flex;gap:10px;align-items:center}
+#prog{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:8px 14px 10px;width:min(300px,38vw);min-width:0}
+#prog .pl{display:flex;gap:8px;align-items:baseline;font-family:var(--display);white-space:nowrap;overflow:hidden}
+#prog .pl b{font-weight:400;color:var(--warn);font-size:1.05rem}
+#prog .pl span{font-size:.95rem;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#prog .pl em{font-style:normal;color:var(--muted);font-size:.8rem;margin-left:auto}
+.pbar{position:relative;height:9px;border-radius:999px;background:rgba(255,255,255,.14);margin-top:6px;overflow:hidden}
+.pbar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;background:linear-gradient(90deg,var(--go),#5fd3a0);transition:width .6s ease}
+.pbar .ticks{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(12.5% - 1px),rgba(11,22,38,.85) calc(12.5% - 1px) 12.5%)}
+.nav{display:flex;gap:6px}
+.round:disabled{opacity:.35;cursor:default}
+#skipBtn.on{background:var(--go);color:var(--go-ink)}
+.menu-panel{display:flex;flex-direction:column;gap:12px;text-align:center}
+.ghost-btn{background:transparent;border:1px solid var(--line);color:var(--paper);border-radius:14px;padding:13px;font-family:var(--display);font-size:1.1rem}
+.ver{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);font-family:var(--display);font-size:.8rem;color:var(--muted);z-index:11}
 #hearts{display:flex;gap:4px;background:var(--glass);border:1px solid var(--line);padding:7px 12px;border-radius:999px}
 #hearts svg{width:26px;height:26px;transition:transform .3s}
 #hearts svg.lost path{fill:#3a4558}
@@ -201,7 +215,10 @@ h1 span{color:#7fd3ff}
   .txt{font-size:1.12rem}
   .opt{font-size:1.04rem;padding:13px 14px}
   .ava{width:58px;height:58px;font-size:1.2rem}
-  #chLabel{font-size:.9rem}
+  #hud{flex-wrap:wrap}
+  #prog{order:2;flex-basis:100%;width:auto;padding:6px 12px 8px}
+  #prog .pl em{display:none}
+  .nav .round{padding:8px 10px}
   .round .lbl{display:none}
 }
 @media (prefers-reduced-motion: reduce){
@@ -224,8 +241,19 @@ h1 span{color:#7fd3ff}
 </div>
 
 <div id="hud" hidden>
-  <div id="chLabel">1장</div>
+  <div id="prog" aria-label="진행도">
+    <div class="pl"><b id="chNum">1장</b><span id="chName">바닷가에 도착했어요</span><em>/ 8장</em></div>
+    <div class="pbar"><i id="pfill"></i><span class="ticks"></span></div>
+  </div>
   <div class="hud-right">
+    <div class="nav">
+      <button class="round" id="backBtn" title="앞 대사 다시 보기" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span class="lbl">뒤로</span></button>
+      <button class="round" id="skipBtn" title="다음 선택지까지 건너뛰기">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 5l8 7-8 7zM12 5l8 7-8 7z"/></svg><span class="lbl">건너뛰기</span></button>
+      <button class="round" id="restartBtn" title="다시 시작">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg><span class="lbl">다시</span></button>
+    </div>
     <div id="hearts" aria-label="남은 하트"></div>
     <button class="round" id="sndBtn" aria-pressed="true" title="효과음 켜기/끄기">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path class="w" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
@@ -249,6 +277,7 @@ h1 span{color:#7fd3ff}
 
 <!-- 시작 화면 (0장) -->
 <div class="cover" id="start">
+  <div class="ver">v1.1.0</div>
   <form class="panel" id="startForm" autocomplete="off">
     <div class="kicker">와석초등학교 현장체험학습</div>
     <h1>지진해일에서 <span>살아남기</span></h1>
@@ -268,11 +297,20 @@ h1 span{color:#7fd3ff}
 
 <div class="cover" id="chapter" hidden><div class="inner"><div class="n" id="chN"></div><div class="t" id="chT"></div><div class="s">자동 저장했어요</div></div></div>
 
+<div class="cover" id="menu" hidden>
+  <div class="panel menu-panel">
+    <p class="fb-title" style="color:var(--paper)">어디서부터 다시 할까요?</p>
+    <button class="big-btn" id="rsChapter">이 장 처음부터</button>
+    <button class="big-btn red" id="rsGame">1장부터 다시 (하트 3개)</button>
+    <button class="ghost-btn" id="rsCancel">계속하기</button>
+  </div>
+</div>
+
 <div class="cover" id="feedback" hidden>
   <div class="panel">
     <div class="fb-heart" id="fbHeart"></div>
     <p class="fb-title">앗, 위험했어요!</p>
-    <div class="lesson"><b>이렇게 기억해요</b><span id="fbText"></span></div>
+    <div class="lesson"><b>왜 위험했을까요?</b><span id="fbText"></span></div>
     <button class="big-btn" id="fbBtn">알겠어요, 계속할게요</button>
   </div>
 </div>
@@ -689,14 +727,17 @@ const SCRIPT = [
   S('jho','음… 모래성도 재밌을 것 같고… 게도 보고 싶고… 어떡하지?'),
   S('jhy','선생님이 깃발 근처에 있으라고 하셨어. 일단 여기서 놀자.'),
   C({id:'1-1', q:'무엇을 하고 놀까? (연습 선택이에요)', practice:true, opts:[
-    {text:'송화랑 모래성 만들기', set:{loc:'sand'}, res:[S('sw','좋아! 세상에서 제일 멋진 모래성 만들자!')]},
-    {text:'성훈이를 따라 바위 쪽에 가보기', set:{loc:'rock'}, res:[BG('rock'), S('sh','거봐, 여기 게 엄청 많지? 내 말 듣길 잘했지?')]},
-    {text:'깃발 근처에서 다 같이 놀자고 하기', set:{loc:'shop'}, res:[BG('shop'), S('jhy','좋아. 여기선 선생님도 잘 보여.')]}
+    {text:'송화랑 넓은 모래사장에서 모래성을 만든다', set:{loc:'sand'}, res:[S('sw','좋아! 세상에서 제일 멋진 모래성 만들자!')]},
+    {text:'성훈이를 따라 바위 쪽으로 게를 보러 간다', set:{loc:'rock'}, res:[BG('rock'), S('sh','거봐, 여기 게 엄청 많지? 내 말 듣길 잘했지?')]},
+    {text:'다 같이 깃발 근처 매점 앞에서 놀자고 한다', set:{loc:'shop'}, res:[BG('shop'), S('jhy','좋아. 여기선 선생님도 잘 보여.')]}
   ]}),
   N('파도 소리가 잔잔하게 들려요. 모두 신나게 놀고 있었어요.'),
   AMB('none'), N('그런데…'),
 
-  /* ---------- 2장 ---------- */
+  /* ---------- 2장 ----------
+     선택지 쓰는 법: 정답과 오답의 길이·말투를 비슷하게 맞춰요.
+     ok:true 정답 → res(결과 + 칭찬)
+     오답 → res(결과 장면) → fb(왜 위험한지) → after(친구들 대화: 남 탓, 앞으로는 이렇게 하자) */
   SAVE(2,'땅이 흔들려요'), AMB('none'), MUS('none'),
   BG(s=>({sand:'beach',rock:'rock',shop:'shop'})[s.loc]), FX('shake'), MUS('tension'),
   N('그때였어요. 쿠르르릉! 발밑의 땅이 크게 흔들리기 시작했어요!'),
@@ -704,18 +745,33 @@ const SCRIPT = [
   S('sh:shock',s=> s.loc==='shop' ? '저기 매점 간판 밑에 숨자! 간판이 막아줄 거야!' : '저기 큰 바위 뒤에 숨자! 바위가 막아줄 거야!'),
   S('sw:scared','{이름}아, 어떻게 해야 해?'),
   C({id:'2-1', q:'흔들리는 동안 어떻게 할까?', hint:'선생님이 지진 나면 머리부터 지키랬어.', card:'e1', opts:[
-    {ok:true, text:'몸을 낮추고 가방이나 팔로 머리를 감싼다', res:[S('jhy:serious','{이름} 말이 맞아! 다들 머리 감싸!'), N('재현이가 재호 손을 잡아 함께 앉혀요.')]},
-    {text:s=> s.loc==='shop'?'성훈이를 따라 매점 간판 밑으로 숨는다':'성훈이를 따라 바위 뒤로 숨는다',
+    {ok:true, text:'그 자리에서 몸을 낮추고 가방으로 머리를 감싼다',
+     res:[S('me','다들 그 자리에 앉아! 가방으로 머리 감싸!'), S('jhy:serious','{이름} 말이 맞아! 다들 머리 감싸!'), N('재현이가 재호 손을 잡아 함께 앉혀요.'),
+          S('sw','{이름} 덕분에 아무도 안 다쳤어. 머리부터 지키는 거, 잘 기억했네!')]},
+    {text:s=> s.loc==='shop' ? '성훈이를 따라 매점 간판 아래로 가서 몸을 숨긴다' : '성훈이를 따라 큰 바위 뒤로 가서 몸을 숨긴다',
      res:[SFX(s=> s.loc==='shop'?'glass':'rocks'), N(s=> s.loc==='shop'?'와장창! 간판 조각이 떨어졌어요. 간신히 피했어요.':'우르르! 돌멩이가 떨어졌어요. 간신히 피했어요.')],
-     fb:'절벽, 간판, 유리창 근처는 물건이 떨어질 수 있어요.'},
-    {text:'무서우니까 버스가 있는 곳까지 마구 뛰어간다', res:[SFX('thud'), N('쿵! 흔들리는 땅에서 넘어져 무릎을 다쳤어요.')], fb:'크게 흔들릴 때 뛰면 넘어지기 쉬워요.'}
+     fb:'절벽, 간판, 유리창 근처는 흔들릴 때 물건이 떨어질 수 있어요. 그 자리에서 몸을 낮추고 머리를 지켜요.',
+     after:[S('jho:upset','성훈이 너 때문에 큰일 날 뻔했잖아!'), S('sh','내가 뭐! 숨자고 한 게 뭐가 잘못이야? 너도 따라왔잖아!'),
+            S('jhy:serious','위에서 뭐가 떨어질 수 있는 데는 피하자. 다음엔 그 자리에서 낮게 앉는 거야.')]},
+    {text:'흔들리는 땅을 피해 버스 있는 곳까지 빠르게 달려간다',
+     res:[SFX('thud'), N('쿵! 흔들리는 땅에서 넘어져 무릎을 다쳤어요.')],
+     fb:'크게 흔들릴 때 뛰면 넘어지기 쉬워요. 흔들림이 멈출 때까지 몸을 낮추고 머리를 보호해요.',
+     after:[S('sw:worried','괜찮아? 무릎에 피 나잖아…'), S('jho:scared','나도 뛰고 싶었는데… 뛰면 더 위험하구나.'),
+            S('jhy','흔들릴 때는 멈춰서 낮게. 움직이는 건 흔들림이 멈춘 다음이야.')]}
   ]}),
   IF(s=>s.loc==='rock',[
     N('흔들림이 조금 약해졌어요. 그런데 머리 위 절벽에서 작은 돌이 톡톡 굴러 내려와요.'),
+    S('sh','바위 옆에 딱 붙어 있으면 괜찮아. 바위가 막아 줄 거야.'),
     S('sw:worried','{이름}아, 여기 계속 있어도 괜찮을까?'),
     C({id:'2-1b', q:'절벽 바로 아래에 있어요. 어떻게 할까?', hint:'절벽 밑은 돌이 떨어질 것 같아…', card:'e2', opts:[
-      {ok:true, text:'흔들림이 약해진 틈에 절벽에서 떨어진 넓은 모래 쪽으로 옮긴다', res:[S('sw','다들 나 따라와! 넓은 모래 쪽으로!'), BG('beach'), N('송화가 앞장서 넓은 모래 쪽으로 친구들을 이끌어요.')]},
-      {text:'바위에 꼭 붙어 있는다', res:[SFX('rocks'), N('작은 돌이 후두둑 떨어져요.')], fb:'절벽 아래는 흔들릴 때 돌이 떨어져 위험해요.'}
+      {ok:true, text:'흔들림이 약해진 틈에 절벽에서 먼 모래밭으로 옮긴다',
+       res:[S('sw','다들 나 따라와! 넓은 모래 쪽으로!'), BG('beach'), N('송화가 앞장서 넓은 모래 쪽으로 친구들을 이끌어요.'),
+            S('jhy','잘 옮겼어. 절벽 밑은 돌이 떨어질 수 있으니까.')]},
+      {text:'바위가 막아 줄 테니 바위 옆에 몸을 꼭 붙이고 있는다',
+       res:[SFX('rocks'), N('작은 돌이 후두둑 떨어져요. 하나가 어깨를 톡 쳤어요.')],
+       fb:'절벽 아래는 흔들릴 때 돌이 떨어져 위험해요. 흔들림이 약해지면 넓은 곳으로 옮겨요.',
+       after:[S('jho:upset','바위가 막아 준다며! 돌이 떨어지잖아!'), S('sh','나도 몰랐다고! 바위가 이렇게 무너질 줄 누가 알아?'),
+              S('sw','바위가 막아 주는 게 아니라 바위가 떨어지는 거야. 얼른 넓은 데로 가자!'), BG('beach')]}
     ]})
   ]),
   FX('stop'), AMB('beach'), N('흔들림이 멈췄어요.'),
@@ -723,10 +779,20 @@ const SCRIPT = [
   S('jho','성훈이 말대로 끝난 거 아니야…? 아, 근데 무서운데… 엄마한테 전화부터 할까?'),
   S('sw:worried','{이름}아, 넌 어떻게 생각해?'),
   C({id:'2-2', q:'흔들림이 멈췄어요. 이제 어떻게 할까?', hint:'바닷가에서 땅이 흔들렸잖아… 바다에서 멀어져야 하지 않을까?', card:'t2', opts:[
-    {ok:true, text:'"바닷가에서 땅이 크게 흔들리면 지진해일이 올 수 있어! 바로 선생님께 가자!"',
-     res:[S('sw','다들 내 모자 보고 따라와!','빨간 모자를 흔들며'), BG('beach'), N('모둠이 파란 깃발로 달려가요.')]},
-    {text:'성훈이 말대로 다시 놀러 간다', res:[N('선생님이 다급하게 불러요.'), S('teacher','얘들아! 빨리 와!')], fb:'바닷가에서 큰 지진을 느꼈다면 경보를 기다리지 말고 바로 대피해야 해요.'},
-    {text:'일단 앉아서 엄마한테 전화를 건다', res:[SFX('busy'), N('전화가 연결되지 않아요. 시간만 흘렀어요.')], fb:'지진 직후엔 전화가 잘 안 돼요. 대피가 먼저예요.'}
+    {ok:true, text:'해일이 올 수도 있으니 바로 선생님께 가자고 한다',
+     res:[S('me','바닷가에서 땅이 크게 흔들리면 지진해일이 올 수 있어! 바로 선생님께 가자!'),
+          S('sw','다들 내 모자 보고 따라와!','빨간 모자를 흔들며'), BG('beach'), N('모둠이 파란 깃발로 달려가요.'),
+          S('jhy','경보가 울리기 전에 먼저 움직인 거, 정말 잘한 거야.')]},
+    {text:'흔들림이 멈췄으니 성훈이를 따라 다시 게를 잡으러 간다',
+     res:[N('선생님이 다급하게 불러요.'), S('teacher','얘들아! 거기 있으면 안 돼! 빨리 와!')],
+     fb:'바닷가에서 큰 지진을 느꼈다면 경보를 기다리지 말고 바로 높은 곳으로 대피해야 해요.',
+     after:[S('jho:upset','거봐, 성훈이 말 들었다가 혼났잖아.'), S('sh','흔들림은 진짜 멈췄잖아! 난 틀린 말 안 했어.'),
+            S('sw:worried','흔들림이 멈춘 다음이 더 위험할 수도 있대. 다음엔 바로 선생님께 가자.')]},
+    {text:'엄마가 걱정하실 테니 앉아서 먼저 엄마께 전화를 건다',
+     res:[SFX('busy'), N('전화가 연결되지 않아요. 시간만 흘렀어요.')],
+     fb:'지진 직후엔 전화가 잘 안 돼요. 연락은 안전한 곳에 간 다음에 해요.',
+     after:[S('jho','나도 엄마한테 전화하려고 했는데… 계속 뚜뚜 소리만 나.'), S('sh','거봐, 내가 놀자고 할 때 갔으면 됐잖아.'),
+            S('jhy','둘 다 아니야. 전화는 높은 곳에 가서 해도 늦지 않아. 지금은 몸부터 옮기자.')]}
   ]}),
   BG('beach'),
   S('teacher','다 왔니? 잘했어요! 이제 높은 곳으로…'),
@@ -740,20 +806,41 @@ const SCRIPT = [
   S('jho','신기하다… 사진 찍어서 엄마한테 보여줄까?'),
   S('sw:worried','{이름}아, 뭔가 이상하지 않아?'),
   C({id:'3-1', q:'바닷물이 빠졌어요! 어떻게 할까?', hint:'바닷물이 이렇게 갑자기 빠지는 거… 좋은 신호 아닌 것 같아.', card:'t3', opts:[
-    {ok:true, text:'"바닷물이 갑자기 빠지는 건 지진해일이 온다는 신호야! 높은 곳으로 가야 해!"',
-     res:[S('jhy:serious','맞아. 텔레비전에서 봤어. 물이 빠지면 큰 파도가 온대.'), S('teacher','모두 저 언덕 쪽으로! 뛰어요!')]},
-    {text:'성훈이를 따라 조개를 주우러 간다', res:[N('멀리서 하얀 물줄기가 보여요.'), S('teacher','당장 돌아와!','소리치며')], fb:'바닷물이 빠지면 곧 큰 물이 몰려와요. 절대 바다 쪽으로 가면 안 돼요.'},
-    {text:'재호랑 바다 사진을 찍는다', res:[N('사진 찍는 사이 다른 반 친구들은 벌써 언덕으로 뛰어가고 있어요.')], fb:'해일이 올 땐 구경하거나 사진 찍을 시간이 없어요.'}
+    {ok:true, text:'물이 갑자기 빠진 건 이상하니 높은 곳으로 가자고 한다',
+     res:[S('me','바닷물이 갑자기 빠지는 건 지진해일이 온다는 신호야! 높은 곳으로 가야 해!'),
+          S('jhy:serious','맞아. 텔레비전에서 봤어. 물이 빠지면 큰 파도가 온대.'), S('teacher','모두 저 언덕 쪽으로! 뛰어요!'),
+          S('sw','{이름}아, 그걸 어떻게 알았어? 정말 대단하다!')]},
+    {text:'물고기가 가득하니 성훈이를 따라 얼른 조개를 주우러 간다',
+     res:[N('멀리서 하얀 물줄기가 보여요.'), S('teacher','당장 돌아와!','소리치며')],
+     fb:'바닷물이 갑자기 빠지면 곧 큰 물이 몰려와요. 절대 바다 쪽으로 가면 안 돼요.',
+     after:[S('jho:upset','성훈이 너 때문에 바다 쪽으로 갈 뻔했잖아!'), S('sh','조개 줍자고 한 거지, 위험하다고는 아무도 안 했잖아!'),
+            S('jhy:serious','물이 갑자기 빠지면 큰 파도가 온다는 뜻이야. 다음엔 바다 반대쪽으로 뛰자.')]},
+    {text:'처음 보는 신기한 모습이니 재호랑 바다 사진부터 찍어 둔다',
+     res:[N('사진 찍는 사이 다른 반 친구들은 벌써 언덕으로 뛰어가고 있어요.')],
+     fb:'해일이 올 땐 구경하거나 사진 찍을 시간이 없어요. 이상한 모습을 보면 바로 대피해요.',
+     after:[S('jho:scared','사진 찍자고 한 거 나야… 미안해.'), S('sh','거봐, 우물쭈물하니까 우리만 늦었잖아.'),
+            S('sw','괜찮아. 대신 이제부터는 구경하지 말고 바로 뛰자!')]}
   ]}),
   SFX('steps'), N('모두 뛰기 시작했는데, 성훈이가 재호 팔을 붙잡았어요.'),
   S('sh','야, 해일이라고 해봤자 그냥 파도야. 무릎까지밖에 안 올걸? 천천히 가도 돼.'),
   S('jho','그, 그래? 나 다리 아픈데… 천천히 갈까…?'),
   N('재호가 {이름}을 바라봐요.'),
-  C({id:'3-2', q:'재호에게 뭐라고 할까?', hint:'재호 혼자 두면 안 될 것 같아. 손을 잡아 주자!', opts:[
-    {ok:true, text:'"무릎 높이 물만 돼도 사람이 넘어지고 휩쓸려! 재호야, 같이 빨리 가자!" (손 내밀기)',
-     res:[N('재호가 {이름}의 손을 꼭 잡아요. 송화가 재호의 반대쪽 손을 잡아 둘이서 양쪽으로 이끌어요.'), S('jho','응… 같이 갈게!'), S('sh','칫… 알았어, 간다고.')]},
-    {text:'"그럴 수도 있겠다. 천천히 가자."', res:[SFX('roar'), N('뒤에서 쏴아아 하는 소리가 점점 커져요. 결국 헐레벌떡 뛰게 됐어요.')], fb:'지진해일은 낮아 보여도 힘이 아주 세요. 서둘러 대피해야 해요.'},
-    {text:'"너희 둘이 알아서 해!" 하고 혼자 먼저 뛰어간다', res:[N('돌아보니 재호와 성훈이가 안 보여요. 송화가 다시 데리러 갔어요.')], fb:'대피할 땐 친구와 흩어지지 않도록 함께 움직여요.'}
+  C({id:'3-2', q:'재호에게 어떻게 할까?', hint:'재호 혼자 두면 안 될 것 같아. 손을 잡아 주자!', opts:[
+    {ok:true, text:'낮은 물도 위험하다고 말하고 재호 손을 잡고 같이 뛴다',
+     res:[S('me','무릎 높이 물만 돼도 사람이 넘어지고 휩쓸려! 재호야, 같이 빨리 가자!'),
+          N('재호가 {이름}의 손을 꼭 잡아요. 송화가 재호의 반대쪽 손을 잡아 둘이서 양쪽으로 이끌어요.'),
+          S('jho','응… 같이 갈게!'), S('sh','칫… 알았어, 간다고.'),
+          S('jhy','혼자 가지 않고 친구 손을 잡은 거, 진짜 멋졌어.')]},
+    {text:'성훈이 말도 맞는 것 같으니 다 같이 천천히 걸어서 간다',
+     res:[SFX('roar'), N('뒤에서 쏴아아 하는 소리가 점점 커져요. 결국 헐레벌떡 뛰게 됐어요.')],
+     fb:'지진해일은 낮아 보여도 힘이 아주 세요. 무릎 높이 물에도 넘어지고 휩쓸릴 수 있어요.',
+     after:[S('jho:cry','다리 아프다고 해서 미안해… 너무 무서웠어.'), S('sh','누가 이렇게 빨리 올 줄 알았냐고! 내 탓 하지 마!'),
+            S('jhy:serious','낮아 보여도 물은 힘이 아주 세. 다음엔 처음부터 빨리 가자.')]},
+    {text:'시간이 없으니 둘은 두고 송화와 먼저 언덕으로 뛰어간다',
+     res:[N('돌아보니 재호와 성훈이가 안 보여요. 송화가 다시 데리러 갔어요.')],
+     fb:'대피할 땐 친구와 흩어지지 않도록 함께 움직여요.',
+     after:[S('jho:cry','나 버리고 가는 줄 알았어…'), S('sw:worried','{이름}아, 친구를 두고 가면 어떡해!'),
+            S('jhy','대피할 때는 다 같이. 손잡고 가면 오히려 더 빨라.')]}
   ]}),
   BG('crowd'), AMB('crowd'), SFX('siren'),
   N('그런데 언덕으로 가는 길은 사람들로 꽉 막혀 있었어요.'),
@@ -770,21 +857,39 @@ const SCRIPT = [
   S('jho:scared','맞아… 기사님 계시면 안전하겠다. 다리도 아픈데… {이름}아, 버스 탈까?'),
   S('sw:scared','{이름}아, 빨리 정해!'),
   C({id:'4-1', q:'어느 길로 갈까?', hint:'초록색 표지판, 우리 학교 안전교육 때 봤던 거랑 똑같아!', card:'t5', opts:[
-    {ok:true, text:'초록색 대피 표지판을 따라 언덕 위로 올라간다', res:[S('jhy','이 초록색 표지판, 학교에서 배운 거야. 이걸 따라가면 돼.'), S('sw','역시 {이름}! 가자!')]},
-    {text:'"기사님이 계시니까 버스가 더 빨라!" 성훈이를 따라 버스에 탄다',
-     res:[SFX('horn'), N('주차장 출구가 차들로 꽉 막혀 버스가 한 발짝도 못 움직여요.'), S('driver','얘들아, 차로는 못 빠져나가! 내려서 언덕으로 뛰어!')],
-     fb:'해일이 오면 모두 차를 타서 길이 막혀요. 차는 물에 떠밀릴 수도 있어요. 걸어서 높은 곳으로 가는 게 가장 빨라요.'},
-    {text:'재호 말대로 바닷가 옆 평평한 큰길로 간다', res:[N('길 옆으로 바다가 계속 보여요.'), S('jhy:serious','여기는 바다랑 너무 가까워!'), N('재현이가 친구들을 돌려세웠어요.')], fb:'대피할 땐 바다에서 멀어지는 방향, 높은 곳으로 가야 해요.'}
+    {ok:true, text:'초록색 대피 표지판이 가리키는 언덕 위쪽 길로 걸어간다',
+     res:[S('jhy','이 초록색 표지판, 학교에서 배운 거야. 이걸 따라가면 돼.'), S('sw','역시 {이름}! 가자!'),
+          S('jho','표지판만 따라가니까 길을 안 헤매네. 다행이다…')]},
+    {text:'기사님이 계신 버스에 다 같이 타서 차로 빠르게 빠져나간다',
+     res:[SFX('horn'), N('도로가 차들로 꽉 막혀 버스가 한 발짝도 못 움직여요.'), S('driver','얘들아, 차로는 못 빠져나가! 내려서 언덕으로 뛰어!')],
+     fb:'해일이 오면 모두 차를 타서 길이 막혀요. 차는 물에 떠밀릴 수도 있어요. 걸어서 높은 곳으로 가는 게 가장 빨라요.',
+     after:[S('jho:upset','버스가 백 배 빠르다며! 하나도 안 움직이잖아!'), S('sh:shock','차가 이렇게 막힐 줄 누가 알았냐고! 너도 타자고 했잖아!'),
+            S('sw','다들 차를 타니까 막히는 거야. 다음엔 무조건 걸어서 높은 곳으로!')]},
+    {text:'다리 아픈 재호를 생각해 바닷가 옆 평평한 큰길로 간다',
+     res:[N('길 옆으로 바다가 계속 보여요.'), S('jhy:serious','여기는 바다랑 너무 가까워!'), N('재현이가 친구들을 돌려세웠어요.')],
+     fb:'대피할 땐 길이 편한지보다 바다에서 멀어지는지, 높은 곳으로 가는지를 봐요.',
+     after:[S('jho:scared','내가 다리 아프다고 해서 이쪽으로 온 거야…'), S('sh','거봐, 버스 탔으면 됐잖아.'),
+            S('sw','버스도 바닷길도 아니야. 천천히라도 같이 언덕으로 올라가자.')]}
   ]}),
   BG('powerline'), SFX('spark'),
   N('언덕길을 오르는데, 지진 때문에 전봇대가 비스듬히 쓰러져 있어요. 끊어진 전깃줄이 길 위에 축 늘어져 있어요.'),
   S('sh:shock','옆길로 돌아가자고? 파도가 코앞인데 돌아갈 시간이 어딨어! 줄 밑으로 쏙 빠지면 1초야. 망설이다가 다 같이 휩쓸린다고!'),
   S('jho:scared','1초면… 괜찮지 않을까…? 아니야, 무서워… {이름}아, 어떡해?'),
   C({id:'4-2', q:'길이 막혔어요. 어떻게 할까?', hint:'전깃줄… 만지면 찌릿할 것 같아. 멀리 떨어지자!', opts:[
-    {ok:true, text:'"전깃줄은 위험해! 멀리 떨어져서 옆길로 돌아가자!"',
-     res:[S('sw','{이름}아, 저기 옆길 있어! 내가 앞장설게!'), N('다섯 친구는 전봇대에서 멀리 떨어진 옆길로 돌아가요.'), S('sh:worried','…불꽃 튀는 거 봤어? 진짜 큰일 날 뻔했네.','작은 목소리로')]},
-    {text:'성훈이 말대로 전깃줄을 넘어간다', res:[SFX('spark'), N('지지직! 전깃줄에서 불꽃이 튀었어요. 깜짝 놀라 뒤로 물러났어요.')], fb:'끊어진 전깃줄은 감전될 수 있어요. 절대 만지거나 가까이 가지 말아요.'},
-    {text:'막대기로 전깃줄을 치우고 지나간다', res:[SFX('spark'), N('지지직! 막대기 끝에서 불꽃이 튀었어요.')], fb:'끊어진 전깃줄은 감전될 수 있어요. 절대 만지거나 가까이 가지 말아요.'}
+    {ok:true, text:'조금 돌아가더라도 전깃줄에서 먼 옆길로 올라간다',
+     res:[S('me','전깃줄은 위험해! 멀리 떨어져서 옆길로 돌아가자!'), S('sw','{이름}아, 저기 옆길 있어! 내가 앞장설게!'),
+          N('다섯 친구는 전봇대에서 멀리 떨어진 옆길로 돌아가요.'), S('sh:worried','…불꽃 튀는 거 봤어? 진짜 큰일 날 뻔했네.','작은 목소리로'),
+          S('jhy','조금 돌아가도 안전한 길이 제일 빠른 길이야.')]},
+    {text:'시간이 없으니 성훈이 말대로 전깃줄 밑으로 재빨리 지나간다',
+     res:[SFX('spark'), N('지지직! 전깃줄에서 불꽃이 튀었어요. 깜짝 놀라 뒤로 물러났어요.')],
+     fb:'끊어진 전깃줄은 감전될 수 있어요. 절대 만지거나 가까이 가지 말아요.',
+     after:[S('jho:upset','1초면 된다며! 진짜 큰일 날 뻔했잖아!'), S('sh:worried','…불꽃이 튈 줄은 몰랐다고. 다들 따라온 거잖아.'),
+            S('jhy:serious','끊어진 전깃줄은 만지지도, 가까이 가지도 말자. 돌아가는 게 맞아.')]},
+    {text:'길을 열려고 막대기로 늘어진 전깃줄을 옆으로 치운다',
+     res:[SFX('spark'), N('지지직! 막대기 끝에서 불꽃이 튀었어요.')],
+     fb:'끊어진 전깃줄은 막대기로 건드려도 감전될 수 있어요. 절대 만지거나 가까이 가지 말아요.',
+     after:[S('sw:scared','막대기로도 전기가 올 수 있대! 깜짝 놀랐잖아.'), S('sh','거봐, 그냥 밑으로 빠지면 됐잖아.'),
+            S('jhy','둘 다 위험해. 전깃줄은 어른들께 맡기고 우리는 멀리 돌아가자.')]}
   ]}),
   BG('stairs'), AMB('roar'),
   N('언덕 중간쯤, 전망대로 올라가는 좁은 계단이 나타났어요. 계단 앞에는 사람들이 몰려 있어요.'),
@@ -798,19 +903,40 @@ const SCRIPT = [
   S('jho','그, 그래…? 성훈이가 같이 가주면…'),
   N('재호가 뒤돌아 내려가려고 해요.'),
   C({id:'5-1', q:'재호의 가방, 어떻게 할까?', hint:'선생님이 대피할 땐 가방 말고 몸만 챙기라고 하셨어.', opts:[
-    {ok:true, text:'"가방은 다시 살 수 있지만 너는 하나뿐이야! 같이 위로 가자!" (재호 손을 잡는다)',
-     res:[S('sw','재호야, 내 가방에 초코과자 있어. 이따 위에서 같이 먹자. 그러니까 지금은 같이 올라가자!'), S('jhy','휴대폰은 내 거 같이 쓰면 돼.'), S('jho','…응. 고마워.','울다가 살짝 웃으며')]},
-    {text:'성훈이와 재호가 가방을 가지러 내려가게 둔다', res:[SFX('roar'), N('몇 걸음 내려가자 바다 쪽에서 하얀 물보라가 보여요. 둘은 새파랗게 질려 다시 올라왔어요.')], fb:'대피할 땐 물건을 가지러 절대 돌아가지 않아요.'},
-    {text:'"그럼 우리 여기서 기다릴게!" 하고 계단 앞에서 기다린다', res:[N('기다리는 사이 사람들이 더 몰려 계단이 꽉 막혔어요.')], fb:'대피할 땐 멈추지 말고 함께 계속 올라가요.'}
+    {ok:true, text:'가방은 다시 살 수 있다고 달래며 재호 손을 잡고 올라간다',
+     res:[S('me','가방은 다시 살 수 있지만 너는 하나뿐이야! 같이 위로 가자!'),
+          S('sw','재호야, 내 가방에 초코과자 있어. 이따 위에서 같이 먹자. 그러니까 지금은 같이 올라가자!'),
+          S('jhy','휴대폰은 내 거 같이 쓰면 돼.'), S('jho','…응. 고마워.','울다가 살짝 웃으며'),
+          S('jhy','물건보다 사람이 먼저야. 좋은 선택이었어.')]},
+    {text:'휴대폰이 꼭 필요하니 성훈이와 재호가 빨리 다녀오게 한다',
+     res:[SFX('roar'), N('몇 걸음 내려가자 바다 쪽에서 하얀 물보라가 보여요. 둘은 새파랗게 질려 다시 올라왔어요.')],
+     fb:'대피할 땐 물건을 가지러 절대 돌아가지 않아요. 몇 걸음 사이에도 물이 몰려올 수 있어요.',
+     after:[S('jho:cry','파도가… 바로 앞에 있었어…'), S('sh:scared','휴대폰 없으면 큰일이라고 생각했단 말이야!'),
+            S('sw','휴대폰보다 너희가 훨씬 중요해. 이제 절대 돌아가지 말자.')]},
+    {text:'재호가 금방 올 테니 다 같이 계단 앞에서 기다려 준다',
+     res:[N('기다리는 사이 사람들이 더 몰려 계단이 꽉 막혔어요.')],
+     fb:'대피할 땐 멈추지 말고 함께 계속 올라가요. 기다리는 동안 길이 막힐 수 있어요.',
+     after:[S('sh','거봐, 기다리다가 사람만 더 많아졌잖아! 그러니까 빨리 갔다 오자니까.'), S('jho:upset','기다리자고 한 건 너잖아…'),
+            S('jhy','누구 탓할 시간에 올라가자. 대피할 땐 멈추지 않기.')]}
   ]}),
   N('계단은 한 사람씩만 오를 수 있을 만큼 좁아요. 사람들이 줄지어 올라가고 있어요.'),
   S('sh:shock','이렇게 느려서 언제 올라가! 뒤에 파도 온다고! 앞사람 밀면서 올라가야 우리가 살아! 나 먼저 간다!'),
   S('jho:scared','밀어야 하나…? 근데 넘어지면 어떡해…'),
   C({id:'5-2', q:'좁은 계단, 어떻게 올라갈까?', hint:'좁은 길에서 밀면 다 넘어질 거야. 한 줄로 가자!', opts:[
-    {ok:true, text:'"밀면 다 같이 넘어져! 한 줄로 서서 난간 잡고 빠르게 올라가자!"',
-     res:[SFX('steps'), S('sw','내가 맨 앞에 설게! {이름}아, 내 가방끈 잡고 따라와!'), N('송화가 맨 앞, 재현이가 맨 뒤를 지켜요.'), S('sw','하나, 둘! 하나, 둘! 난간 꼭 잡아!'), S('jhy:serious','천천히 말고, 빠르게. 그런데 밀지는 말고.'), N('성훈이도 결국 줄 안으로 들어와요.')]},
-    {text:'성훈이처럼 앞사람을 밀면서 올라간다', res:[SFX('thud'), N('앞사람이 휘청! 줄줄이 넘어질 뻔해서 모두 멈춰 버렸어요.')], fb:'좁은 곳에서 밀면 여러 사람이 한꺼번에 넘어져 크게 다쳐요.'},
-    {text:'계단 옆 풀숲 비탈로 기어 올라간다', res:[SFX('slip'), N('젖은 흙에 미끄러져 주르륵 내려왔어요.')], fb:'정해진 대피길이 가장 안전해요.'}
+    {ok:true, text:'밀지 않고 한 줄로 서서 난간을 잡고 빠르게 올라간다',
+     res:[SFX('steps'), S('sw','내가 맨 앞에 설게! {이름}아, 내 가방끈 잡고 따라와!'), N('송화가 맨 앞, 재현이가 맨 뒤를 지켜요.'),
+          S('sw','하나, 둘! 하나, 둘! 난간 꼭 잡아!'), S('jhy:serious','천천히 말고, 빠르게. 그런데 밀지는 말고.'), N('성훈이도 결국 줄 안으로 들어와요.'),
+          S('jho','한 줄로 가니까 오히려 더 빨리 올라가지네!')]},
+    {text:'뒤에서 파도가 오니 성훈이처럼 앞사람을 밀며 올라간다',
+     res:[SFX('thud'), N('앞사람이 휘청! 줄줄이 넘어질 뻔해서 모두 멈춰 버렸어요.')],
+     fb:'좁은 곳에서 밀면 여러 사람이 한꺼번에 넘어져 크게 다쳐요. 한 줄로 빠르게 가요.',
+     after:[S('jho:scared','앞사람이 넘어질 뻔했어…'), S('sh','늦으면 다 같이 휩쓸린다고 생각했다고! 내가 틀렸어?'),
+            S('sw','밀면 다 같이 넘어져서 더 늦어져. 한 줄로, 빠르게!')]},
+    {text:'계단이 막혔으니 옆 풀숲 비탈로 돌아서 기어 올라간다',
+     res:[SFX('slip'), N('젖은 흙에 미끄러져 주르륵 내려왔어요.')],
+     fb:'비탈은 미끄러워 떨어질 수 있어요. 정해진 대피길이 가장 안전해요.',
+     after:[S('sw:worried','괜찮아? 흙투성이가 됐네.'), S('sh','풀숲이 더 빠를 줄 알았지…'),
+            S('jhy','정해진 길이 제일 안전해. 다시 계단으로 가자.')]}
   ]}),
   N('송화가 먼저 전망대에 도착해 손을 뻗어요.'),
   S('sw:scared','{이름}아! 거의 다 왔어! 내 손 잡아!'),
@@ -822,10 +948,10 @@ const SCRIPT = [
   N('발이 미끄러진 {이름}의 몸이 뒤로 기우뚱 넘어가요!'),
   S('sw:shock','{이름}아! 내 손!!'),
   C({id:'6-1', q:'빨리! 5초 안에 골라요!', timer:5, noHint:true, opts:[
-    {ok:true, text:'한 손은 난간, 한 손은 송화 손을 꽉 잡는다', res:[]},
-    {text:'떨어진 신발을 주우려고 손을 뻗는다', res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 물건보다 몸을 지탱할 곳을 먼저 잡아요.'},
-    {text:'무서워서 두 눈을 감고 몸을 웅크린다', res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 물건보다 몸을 지탱할 곳을 먼저 잡아요.'}
-  ], timeout:{res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 물건보다 몸을 지탱할 곳을 먼저 잡아요.'}}),
+    {ok:true, text:'한 손은 난간을, 한 손은 송화 손을 꽉 잡는다', res:[]},
+    {text:'떨어지는 신발을 잡으려고 얼른 손을 뻗는다', res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 물건보다 몸을 지탱할 곳을 먼저 잡아요.'},
+    {text:'너무 무서워서 두 눈을 꼭 감고 몸을 웅크린다', res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 눈을 감기보다 몸을 지탱할 곳을 먼저 잡아요.'}
+  ], timeout:{res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 망설이지 말고 몸을 지탱할 곳을 먼저 잡아요.'}}),
   N('송화가 위에서 {이름}의 손을 꽉 붙잡았어요. 하지만 혼자 힘으로는 끌어올릴 수가 없어요.'),
   N('그때, 맨 뒤에 있던 재현이가 {이름}의 등을 힘껏 밀어 올렸어요.'),
   S('jhy:serious','{이름}아, 올라가!!'),
@@ -847,28 +973,50 @@ const SCRIPT = [
   S('jho:cry','맞아… 재현이가 우리 구해줬는데… 우리도 가야 하는 거 아니야…?'),
   S('sw:worried','{이름}아… 나도 가고 싶어. 근데…','주먹을 꽉 쥐며'),
   C({id:'7-1', q:'재현이를 구하러 내려갈까?', hint:'뉴스에서 봤는데, 해일은 한 번만 오는 게 아니래.', card:'t4', opts:[
-    {ok:true, text:'"해일은 한 번으로 끝나지 않아! 내려가면 우리도 위험해. 어른들께 알리자!"',
-     res:[FX('wave'), N('그 순간, 첫 번째보다 더 큰 물이 언덕 아래를 다시 덮쳐요.'), S('sw:scared','…{이름} 말 안 들었으면 우리 저기 있었겠다.'), N('재호가 말없이 {이름}의 팔을 꼭 잡아요.')]},
-    {text:'성훈이와 함께 재현이를 찾으러 내려간다', res:[FX('wave'), N('계단을 몇 칸 내려가자 바다 쪽에서 또다시 쏴아아! 허겁지겁 다시 올라왔어요.')], fb:'지진해일은 여러 번 몰려와요. 두 번째 물이 더 클 수도 있어요. 물이 빠져도 절대 내려가지 않아요.'},
-    {text:'"물가까지만 살짝 내려가서 보고 오자"', res:[FX('wave'), N('계단을 몇 칸 내려가자 바다 쪽에서 또다시 쏴아아! 허겁지겁 다시 올라왔어요.')], fb:'지진해일은 여러 번 몰려와요. 두 번째 물이 더 클 수도 있어요. 물이 빠져도 절대 내려가지 않아요.'}
+    {ok:true, text:'해일이 또 올 수 있으니 여기 남아 어른들께 알리자고 한다',
+     res:[S('me','해일은 한 번으로 끝나지 않아! 내려가면 우리도 위험해. 어른들께 알리자!'),
+          FX('wave'), N('그 순간, 첫 번째보다 더 큰 물이 언덕 아래를 다시 덮쳐요.'),
+          S('sw:scared','…{이름} 말 안 들었으면 우리 저기 있었겠다.'), N('재호가 말없이 {이름}의 팔을 꼭 잡아요.')]},
+    {text:'친구를 구해야 하니 성훈이와 함께 계단을 뛰어 내려간다',
+     res:[FX('wave'), N('계단을 몇 칸 내려가자 바다 쪽에서 또다시 쏴아아! 허겁지겁 다시 올라왔어요.')],
+     fb:'지진해일은 여러 번 몰려와요. 두 번째 물이 더 클 수도 있어요. 물이 빠져도 절대 내려가지 않아요.',
+     after:[S('jho:cry','또 파도가 왔어… 우리까지 휩쓸릴 뻔했어.'), S('sh:scared','재현이를 구하려고 그런 거잖아! 내가 뭘 잘못했는데!'),
+            S('sw:worried','재현이를 구하고 싶은 마음은 다 같아. 그래도 우리는 여기서 구조대를 불러야 해.')]},
+    {text:'물가까지만 조심조심 내려가서 재현이가 있는지 살펴본다',
+     res:[FX('wave'), N('계단을 몇 칸 내려가자 바다 쪽에서 또다시 쏴아아! 허겁지겁 다시 올라왔어요.')],
+     fb:'조금만 내려가도 위험해요. 지진해일은 여러 번 몰려오니 물이 빠져도 내려가지 않아요.',
+     after:[S('jho:scared','조금만 내려가도 이렇게 무서운데…'), S('sh','거봐, 다 같이 갔으면 찾았을 수도 있잖아!'),
+            S('sw','아니야. 해일은 여러 번 와. 재현이는 구조대가 찾을 수 있게 우리가 알리자.')]}
   ]}),
   FX('tremble'), N('두 번째 물이 지나가고, 전망대 바닥이 다시 조금 흔들렸어요.'),
   BG('deckcrack'),
   S('sh:shock','야! 난간 쪽 바닥 봐! 땅이 갈라졌어! 다들 안쪽 벤치 쪽으로 와!'),
   S('jho:upset','성훈이가 하는 말… 또 틀린 거 아니야? 계속 이상한 말만 했잖아…'),
   C({id:'7-2', q:'성훈이의 말, 어떻게 할까?', hint:'누가 말했는지보다… 바닥을 봐. 진짜 갈라졌어!', opts:[
-    {ok:true, text:'성훈이 말대로 갈라진 곳에서 떨어져 안쪽으로 옮긴다', res:[SFX('crack'), N('네 친구는 안쪽 벤치로 옮겨요. 잠시 뒤 난간 옆 바닥이 와르르 무너져요.'), N('성훈이는 아무 말 없이 바다만 바라봐요.')]},
-    {text:'"성훈이는 계속 틀렸잖아. 이번에도 무시하자."', res:[SFX('crack'), N('우지직! 난간 옆 바닥이 더 크게 갈라졌어요. 송화가 {이름}을 잡아당겼어요.')], fb:'누가 말했는지보다 무슨 말인지를 보고 판단해요.'},
-    {text:'갈라진 곳이 진짜인지 난간 쪽으로 가서 확인해 본다', res:[SFX('rocks'), N('발밑 흙이 부스스 무너져요. 깜짝 놀라 뒤로 물러났어요.')], fb:'갈라진 땅은 무너질 수 있어요. 가까이 가지 않아요.'}
+    {ok:true, text:'바닥이 정말 갈라졌으니 성훈이 말대로 안쪽으로 옮긴다',
+     res:[SFX('crack'), N('네 친구는 안쪽 벤치로 옮겨요. 잠시 뒤 난간 옆 바닥이 와르르 무너져요.'), N('성훈이는 아무 말 없이 바다만 바라봐요.'),
+          S('sw','누가 말했는지보다 무슨 말인지가 중요하구나. {이름}아, 잘 골랐어.')]},
+    {text:'성훈이는 계속 틀렸으니 이번 말도 믿지 않고 그대로 있는다',
+     res:[SFX('crack'), N('우지직! 난간 옆 바닥이 더 크게 갈라졌어요. 송화가 {이름}을 잡아당겼어요.')],
+     fb:'누가 말했는지보다 무슨 말인지를 보고 판단해요. 이번에는 성훈이 말이 맞았어요.',
+     after:[S('sh:shock','내가 갈라졌다고 했잖아! 왜 내 말은 안 들어!'), S('jho:upset','…맨날 이상한 말만 하니까 그렇지.'),
+            S('sw','이번엔 성훈이 말이 맞았어. 누가 말했는지 말고, 무슨 말인지 보자.')]},
+    {text:'정말 갈라졌는지 난간 쪽으로 가까이 가서 직접 확인해 본다',
+     res:[SFX('rocks'), N('발밑 흙이 부스스 무너져요. 깜짝 놀라 뒤로 물러났어요.')],
+     fb:'갈라진 땅은 갑자기 무너질 수 있어요. 확인하러 가까이 가지 않아요.',
+     after:[S('sw:scared','{이름}아! 갈라진 데는 가까이 가면 안 돼!'), S('sh','거봐, 내 말 그냥 들었으면 됐잖아.'),
+            S('jho:scared','나도 보러 갈 뻔했어… 앞으로는 멀리서만 볼게.')]}
   ]}),
   N('그때, 사람들 사이로 파란 깃발이 보였어요.'),
   S('teacher','얘들아! 여기 있었구나!','네 명을 꼭 끌어안으며'),
   MUS('sad'), S('teacher','…재현이는?'),
   C({id:'7-3', q:'선생님께 어떻게 말할까?', unscored:true, noHint:true, opts:[
-    {ok:true, text:'재현이가 어디서, 어떻게 휩쓸렸는지 선생님께 바로 자세히 말씀드린다',
-     res:[S('me','재현이가 저를 밀어서 올려주고, 계단 맨 아래에서 물에 휩쓸렸어요!'), S('sw:worried','재현이 오늘 노란 티셔츠 입었어요!'), S('teacher','119죠? 아이 한 명이 해일에 휩쓸렸어요. 언덕 전망대 계단 아래, 노란 티셔츠…','바로 전화를 걸며')]},
-    {text:'혼날까 봐 "잘 모르겠어요"라고 말한다', res:[S('teacher','괜찮아, 혼내려는 게 아니야. 재현이를 빨리 찾으려면 {이름}이 도와줘야 해. 재현이를 마지막으로 어디서 봤니?','눈높이를 맞춰 앉으며')]},
-    {text:'너무 슬퍼서 아무 말도 못 하고 운다', res:[S('teacher','많이 무서웠지. 울어도 괜찮아. 그런데 재현이를 빨리 찾으려면 {이름}이 도와줘야 해. 재현이를 마지막으로 어디서 봤니?','꼭 안아주며')]}
+    {ok:true, text:'재현이가 어디서 어떻게 휩쓸렸는지 바로 자세히 말씀드린다',
+     res:[S('me','재현이가 저를 밀어서 올려주고, 계단 맨 아래에서 물에 휩쓸렸어요!'), S('sw:worried','재현이 오늘 노란 티셔츠 입었어요!'),
+          S('teacher','119죠? 아이 한 명이 해일에 휩쓸렸어요. 언덕 전망대 계단 아래, 노란 티셔츠…','바로 전화를 걸며'),
+          S('teacher','정확하게 말해 줘서 고마워. 덕분에 구조대가 재현이를 빨리 찾을 수 있을 거야.')]},
+    {text:'혼날 것 같아서 잘 모르겠다고 작은 목소리로 대답한다', res:[S('teacher','괜찮아, 혼내려는 게 아니야. 재현이를 빨리 찾으려면 {이름}이 도와줘야 해. 재현이를 마지막으로 어디서 봤니?','눈높이를 맞춰 앉으며')]},
+    {text:'너무 슬퍼서 아무 말도 못 하고 고개를 숙인 채 운다', res:[S('teacher','많이 무서웠지. 울어도 괜찮아. 그런데 재현이를 빨리 찾으려면 {이름}이 도와줘야 해. 재현이를 마지막으로 어디서 봤니?','꼭 안아주며')]}
   ]}),
   SFX('heli'), N('멀리서 두두두두… 구조 헬리콥터 소리가 들려오기 시작했어요.'),
 
@@ -879,10 +1027,20 @@ const SCRIPT = [
   S('sh','저기 봐, 사람들도 벌써 내려가잖아. 우리가 제일 먼저 찾아야지!'),
   N('몇몇 사람들이 하나둘 계단을 내려가기 시작해요.'),
   C({id:'8-1', q:'지금 재현이를 찾으러 갈까?', hint:'재현이 찾고 싶은 건 나도 똑같아. 근데 방송에서 괜찮다고 할 때까지는 기다려야 하지 않을까?', card:'t4b', opts:[
-    {ok:true, text:'"재현이 찾는 건 구조대가 하고 있어. 안내 방송이나 구조대원이 안전하다고 할 때까지 여기서 기다리자"',
-     res:[SFX('ding'), S('radio','지진해일 경보가 해제되었습니다. 구조대의 안내에 따라 이동해 주세요.'), S('teacher','잘 기다렸어요. 이제 선생님이랑 같이 내려가요.')]},
-    {text:'다른 사람들을 따라 내려가서 재현이를 찾아본다', res:[S('rescuer','아직 위험합니다! 모두 다시 올라가세요!','확성기로 외치며')], fb:'바다가 조용해 보여도, 안전하다는 안내가 있을 때까지 높은 곳에서 기다려요.'},
-    {text:'재호와 둘이 먼저 내려가 재현이 이름을 부르며 찾아본다', res:[S('rescuer','아직 위험합니다! 모두 다시 올라가세요!','확성기로 외치며')], fb:'바다가 조용해 보여도, 안전하다는 안내가 있을 때까지 높은 곳에서 기다려요.'}
+    {ok:true, text:'안내 방송이나 구조대원이 괜찮다고 할 때까지 여기서 기다린다',
+     res:[S('me','재현이 찾는 건 구조대가 하고 있어. 안전하다는 안내가 나올 때까지 여기서 기다리자.'),
+          SFX('ding'), S('radio','지진해일 경보가 해제되었습니다. 구조대의 안내에 따라 이동해 주세요.'),
+          S('teacher','잘 기다렸어요. 끝까지 침착했구나. 이제 선생님이랑 같이 내려가요.')]},
+    {text:'다른 사람들도 내려가니 그 뒤를 따라 내려가서 재현이를 찾는다',
+     res:[S('rescuer','아직 위험합니다! 모두 다시 올라가세요!','확성기로 외치며')],
+     fb:'바다가 조용해 보여도, 안전하다는 안내가 있을 때까지 높은 곳에서 기다려요.',
+     after:[S('sh','다른 사람들도 내려갔다고! 나만 그런 거 아니잖아.'), S('jho:upset','네가 사람들도 내려간다고 해서 따라간 거잖아…'),
+            S('sw','다른 사람이 한다고 안전한 건 아니야. 우리 안내 방송을 기다리자.')]},
+    {text:'재호와 둘이 먼저 내려가서 재현이 이름을 부르며 찾아본다',
+     res:[S('rescuer','아직 위험합니다! 모두 다시 올라가세요!','확성기로 외치며')],
+     fb:'친구를 찾는 일은 구조대에게 맡기고, 안전하다는 안내가 있을 때까지 높은 곳에서 기다려요.',
+     after:[S('jho:cry','재현이 부르면 대답할 줄 알았어…'), S('sh','거봐, 둘만 가니까 혼나잖아.'),
+            S('sw:worried','나도 재현이 보고 싶어. 그래도 재현이는 구조대가 찾아 줄 거야. 우리 기다리자.')]}
   ]}),
   IF(s=>!s.lastOk,[ N('얼마 뒤…'), SFX('ding'), S('radio','지진해일 경보가 해제되었습니다. 구조대의 안내에 따라 이동해 주세요.'), S('teacher','이제 선생님이랑 같이 내려가요.') ]),
   BG('rescue'), AMB('calm'),
@@ -1327,6 +1485,40 @@ function fx(k){
   if (k === 'white'){ const f=$('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); Sound.amb('none'); }
 }
 
+/* =================================================================
+   흐름 제어: 뒤로가기 · 건너뛰기 · 재시작
+   - 장이 시작될 때 상태를 저장(saveSnap)하고, 그 장에서 고른 선택(decisions)과
+     지나간 대사 번호(line)를 기록해요.
+   - 뒤로가기 = 장 처음부터 같은 선택으로 '빨리 감기'해서 바로 앞 대사에서 멈추기
+   - 이미 고른 선택보다 앞으로는 돌아갈 수 없어요 (틀린 답을 지워서 하트를 되살리지 못하게)
+   ================================================================= */
+const ABORT = { abort: true };
+let runId = 0;            // 지금 돌아가는 흐름 번호. 바뀌면 예전 흐름은 멈춰요
+let pendings = [];        // 기다리는 중인 것들 (멈출 때 한꺼번에 풀어요)
+let ff = null;            // 빨리 감기 중: {decisions, di, stopLine, hint}
+let skipping = false;     // 건너뛰기 중 (다음 선택지까지)
+let chap = newChap();     // 이번 장의 기록
+function newChap(){ return { line: 0, pos: 0, decisions: [], decLine: 0, hint: false }; }
+const fast = ()=> !!ff || skipping;
+const sfx = (k)=>{ if (!ff) Sound.play(k); };
+
+// 취소할 수 있는 기다림: 다른 흐름으로 바뀌면 ABORT로 멈춰요
+function waitFor(setup){
+  const id = runId;
+  return new Promise((resolve, reject)=>{
+    const p = { cancel: ()=>reject(ABORT) };
+    pendings.push(p);
+    setup(v=>{ pendings = pendings.filter(x=>x !== p); if (id !== runId) reject(ABORT); else resolve(v); });
+  });
+}
+function check(id){ if (id !== runId) throw ABORT; }
+function abortRun(){
+  runId++; const ps = pendings; pendings = []; ps.forEach(p=>p.cancel());
+  advance = null; skipping = false;
+  ['choices','feedback','over','cardBox','chapter','menu'].forEach(id=>{ const el = $(id); if (el) el.hidden = true; });
+  $('choices').innerHTML = '';
+}
+
 /* 말풍선: 글자가 한 글자씩 나오고, 누르면 다음으로 넘어가요 */
 let advance = null;   // 지금 '누르면 실행할 일'
 function showLine(who, text, dir){
@@ -1353,20 +1545,27 @@ function lighten(hex){ // 이름 글자를 프로필 색보다 밝게
   return `rgb(${f(n>>16)},${f((n>>8)&255)},${f(n&255)})`;
 }
 function say(who, rawText, dir){
+  const lineNo = chap.line++;
+  if (ff){ if (lineNo < ff.stopLine) return; endFF(); }
   const text = fill(rawText);
   showLine(who, text, dir);
-  speak(text);
   const txt = $('txt'), next = $('next');
+  if (skipping){ txt.textContent = text; return; }
+  chap.pos = lineNo; updateNav();
+  speak(text);
   next.classList.remove('on');
-  return new Promise(resolve=>{
-    let i = 0, done = false;
-    const finish = ()=>{ done = true; txt.textContent = text; next.classList.add('on'); advance = ()=>{ advance = null; resolve(); }; };
+  const id = runId;      // 뒤로가기 등으로 흐름이 바뀌면 이 대사의 타자 효과도 멈춰요
+  return waitFor(done=>{
+    let i = 0, finished = false;
+    const finish = ()=>{ if (id !== runId) return; finished = true; txt.textContent = text; next.classList.add('on'); advance = ()=>{ advance = null; done(); }; };
     if (reduceMotion){ finish(); return; }
     txt.textContent = '';
     advance = finish;     // 글자가 나오는 중에 누르면 한 번에 다 보여줘요
-    (function type(){ if (done) return; i += 1; txt.textContent = text.slice(0,i); if (i >= text.length) finish(); else setTimeout(type, 28); })();
+    (function type(){ if (finished || id !== runId) return; i += 1; txt.textContent = text.slice(0,i); if (i >= text.length) finish(); else setTimeout(type, 28); })();
   });
 }
+function endFF(){ ff = null; updateNav(); }
+function stopSkip(){ if (skipping){ skipping = false; updateNav(); } }
 // 화면을 누르거나 스페이스/엔터를 누르면 다음으로
 $('dialog').addEventListener('click', ()=>{ if (advance && $('choices').hidden) advance(); });
 $('stage').addEventListener('click', ()=>{ if (advance && $('choices').hidden && !$('dialog').hidden) advance(); });
@@ -1375,20 +1574,24 @@ addEventListener('keydown', e=>{ if ((e.key===' '||e.key==='Enter') && advance &
 /* 덮개 화면 보여주고 버튼 누를 때까지 기다리기 */
 function waitButton(coverId, btnId){
   $(coverId).hidden = false;
-  return new Promise(r=>{ $(btnId).onclick = ()=>{ $(coverId).hidden = true; r(); }; });
+  return waitFor(done=>{ $(btnId).onclick = ()=>{ $(coverId).hidden = true; done(); }; });
 }
 
 /* 장 제목 */
 async function showChapter(n, title){
   $('chN').textContent = n + '장'; $('chT').textContent = title;
-  $('chLabel').textContent = `${n}장 · ${title}`;
-  $('chapter').hidden = false; Sound.play('chapter'); speak(`${n}장. ${title}`);
-  await new Promise(r=>{ const t = setTimeout(r, 2200); $('chapter').onclick = ()=>{ clearTimeout(t); r(); }; });
+  $('chNum').textContent = `${n}장`; $('chName').textContent = title;
+  if (ff) return;
+  stopSkip();
+  $('chapter').hidden = false; sfx('chapter'); speak(`${n}장. ${title}`);
+  await waitFor(done=>{ const t = setTimeout(done, 2200); $('chapter').onclick = ()=>{ clearTimeout(t); done(); }; });
   $('chapter').hidden = true;
 }
 
 /* 카드뉴스 팝업 */
 function showCard(k){
+  if (ff) return;
+  stopSkip();
   const c = CARDS[k];
   const box = $('cardBox');
   box.innerHTML = `<div class="card" role="dialog" aria-label="${c.title}">
@@ -1396,36 +1599,46 @@ function showCard(k){
     <div class="card-body">${c.img ? `<img src="${c.img}" alt="${c.title}">` : ''}<h3>${c.title}</h3>
       <ul>${c.lines.map((l,i)=>`<li class="${c.emph===i?'emph':''}">${l}</li>`).join('')}</ul></div>
     <div class="card-foot"><small>출처: 행정안전부</small><button class="big-btn" id="cardOk">알겠어요!</button></div></div>`;
-  Sound.play('card'); speak(c.title + '. ' + c.lines.join(' '));
+  sfx('card'); speak(c.title + '. ' + c.lines.join(' '));
   return waitButton('cardBox','cardOk');
 }
 
-/* 틀렸을 때 피드백 */
+/* 틀렸을 때: 왜 위험한지 알려줘요 */
 function showFeedback(text){
+  if (ff) return;
+  stopSkip();
   $('fbHeart').innerHTML = HEART.replace('<svg','<svg style="filter:grayscale(1)"');
   $('fbText').textContent = text;
   speak('앗, 위험했어요! ' + text);
   return waitButton('feedback','fbBtn');
 }
 
-/* 순서를 섞어요 (정답이 늘 첫 번째에 있으면 외워 버리니까요) */
+/* 순서를 섞어요 (정답이 늘 같은 자리에 있으면 외워 버리니까요) */
 function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 /* 선택지 보여주고, 고른 것을 돌려줘요 */
 function askChoice(c, opts){
+  const byK = (k)=> k === -1 ? {timeout:true, k:-1, ...c.timeout} : opts.find(o=>o.k === k);
+  // 빨리 감기 중이면 예전에 골랐던 것을 그대로 골라요
+  if (ff){
+    if (ff.di < ff.decisions.length){ const k = ff.decisions[ff.di++]; chap.decisions.push(k); chap.decLine = chap.line; return Promise.resolve(byK(k)); }
+    endFF();
+  }
+  stopSkip();
+  chap.pos = chap.line; updateNav();
   const box = $('choices');
   box.innerHTML = '';
   const q = document.createElement('div'); q.className = 'q'; q.textContent = fill(c.q); box.appendChild(q);
-  let timerId = null;
-  return new Promise(resolve=>{
-    let tickId = null;
-    const pick = (o)=>{ clearTimeout(timerId); clearInterval(tickId); Sound.play('tap'); box.hidden = true; box.innerHTML = ''; resolve(o); };
+  let timerId = null, tickId = null;
+  return waitFor(done=>{
+    const pick = (o)=>{ clearTimeout(timerId); clearInterval(tickId); sfx('tap'); box.hidden = true; box.innerHTML = '';
+      chap.decisions.push(o.k); chap.decLine = chap.line; updateNav(); done(o); };
     if (c.timer){
       const bar = document.createElement('div'); bar.className = 'timer'; bar.innerHTML = '<i></i>'; box.appendChild(bar);
-      const i = bar.firstChild;
-      i.animate([{transform:'scaleX(1)'},{transform:'scaleX(0)'}], {duration:c.timer*1000, fill:'forwards'});
-      timerId = setTimeout(()=>pick({timeout:true, ...c.timeout}), c.timer*1000);
-      Sound.play('tick'); tickId = setInterval(()=>Sound.play('tick'), 1000);
+      bar.firstChild.animate([{transform:'scaleX(1)'},{transform:'scaleX(0)'}], {duration:c.timer*1000, fill:'forwards'});
+      timerId = setTimeout(()=>pick(byK(-1)), c.timer*1000);
+      sfx('tick'); tickId = setInterval(()=>sfx('tick'), 1000);
+      pendings.push({cancel:()=>{ clearTimeout(timerId); clearInterval(tickId); }});
     }
     opts.forEach((o, n)=>{
       const b = document.createElement('button');
@@ -1438,7 +1651,7 @@ function askChoice(c, opts){
     if (c.hint && !c.noHint && !state.hintUsed && state.ch >= 2){
       const h = document.createElement('button');
       h.className = 'hint'; h.textContent = '송화에게 물어보기 (이 장에서 한 번)';
-      h.onclick = ()=>{ state.hintUsed = true; h.remove(); showLine('sw'); const t = fill(c.hint); $('txt').textContent = t; $('next').classList.remove('on'); speak(t); };
+      h.onclick = ()=>{ state.hintUsed = true; chap.hint = true; h.remove(); showLine('sw'); const t = fill(c.hint); $('txt').textContent = t; $('next').classList.remove('on'); speak(t); };
       box.appendChild(h);
     }
     box.hidden = false;
@@ -1446,28 +1659,34 @@ function askChoice(c, opts){
   });
 }
 
-/* 선택 한 개 처리: 연습 / 하트 없는 선택 / 보통 선택 */
+/* 선택 한 개 처리: 연습 / 하트 없는 선택 / 보통 선택
+   정답: res(결과 + 칭찬 대사) → 카드뉴스
+   오답: res(결과 장면) → 하트 -1 → 왜 위험한지(fb) → after(인물들의 대화: 남 탓, 앞으로는 이렇게 하자) */
 async function doChoice(c){
+  const id = runId;
   let opts = c.opts.map((o,k)=>({...o, k}));
   if (!c.unscored) opts = shuffle(opts);
   while (true){
-    const o = await askChoice(c, opts);
+    const o = await askChoice(c, opts); check(id);
     if (c.practice){ Object.assign(state, o.set || {}); return runSteps(o.res || []); }
     if (c.unscored){
-      await runSteps(o.res || []);
+      await runSteps(o.res || []); check(id);
       if (o.ok) return;
       opts = opts.filter(x=>x.ok);        // 선생님이 다시 묻고, 첫 번째 선택지만 남아요
       continue;
     }
-    const r = await runSteps(o.res || []);
+    const r = await runSteps(o.res || []); check(id);
     if (r === 'over') return r;
     state.lastOk = !!o.ok;
-    if (o.ok){ Sound.play('correct'); await wait(450); if (c.card) await showCard(c.card); return; }
-    // 틀렸어요: 하트 1개 줄고, 피드백을 보여준 뒤 이야기는 계속돼요
-    state.hearts -= 1; drawHearts(state.hearts); Sound.play('wrong'); setTimeout(()=>Sound.play('heart'), 300);
+    if (o.ok){
+      sfx('correct'); if (!fast()) await wait(450); check(id);
+      if (c.card) await showCard(c.card);
+      return;
+    }
+    state.hearts -= 1; drawHearts(state.hearts); sfx('wrong'); if (!ff) setTimeout(()=>Sound.play('heart'), 300);
     if (state.hearts <= 0){ lastLesson = o.fb; return 'over'; }
-    await showFeedback(o.fb);
-    return;
+    await showFeedback(o.fb); check(id);
+    return runSteps(o.after || []);
   }
 }
 
@@ -1475,48 +1694,97 @@ async function doChoice(c){
 let lastLesson = '';
 async function runStep(s){
   switch (s.t){
-    case 'say': playVoice(s.voice); return say(s.who, s.text, s.dir);
+    case 'say': if (!fast()) playVoice(s.voice); return say(s.who, s.text, s.dir);
     case 'bg': setBg(typeof s.k === 'function' ? s.k(state) : s.k); return;
-    case 'fx': fx(s.k); if (s.k==='wave'||s.k==='white') await wait(700); return;
+    case 'fx':
+      if (fast() && ['wave','white','tremble'].includes(s.k)){ if (s.k === 'white') Sound.amb('none'); return; }
+      fx(s.k); if (s.k==='wave'||s.k==='white') await wait(700); return;
     case 'card': return showCard(s.k);
-    case 'sfx': Sound.play(typeof s.k === 'function' ? s.k(state) : s.k); return;
+    case 'sfx': if (!fast()) Sound.play(typeof s.k === 'function' ? s.k(state) : s.k); return;
     case 'amb': Sound.amb(s.k); return;
     case 'mus': Sound.music(s.k); return;
     case 'choice': return doChoice(s);
     case 'if': if (s.cond(state)) return runSteps(s.steps); return;
     case 'save':
-      state.ch = s.ch; state.chTitle = s.title; state.hintUsed = false;
+      state.ch = s.ch; state.chTitle = s.title; state.hintUsed = ff ? ff.hint : false;
       saveSnap = JSON.parse(JSON.stringify(state));   // 지금 상태를 저장(세이브)
-      $('dialog').hidden = true;
+      chap = newChap(); chap.hint = state.hintUsed;
+      if (!ff) $('dialog').hidden = true;
       return showChapter(s.ch, s.title);
-    case 'end': return showEnding();
+    case 'end': stopSkip(); return showEnding();
   }
 }
 async function runSteps(list){
-  for (const s of list){ const r = await runStep(s); if (r === 'over') return 'over'; }
+  const id = runId;
+  for (const s of list){ const r = await runStep(s); check(id); if (r === 'over') return 'over'; }
 }
 
 /* 게임 전체 흐름: 하트가 0이 되면 이번 장 처음으로 돌아가요 */
-let saveSnap = null;
-async function play(){
-  let i = 0;
-  while (i < SCRIPT.length){
-    if (SCRIPT[i].t === 'save') saveIdx = i;
-    const r = await runStep(SCRIPT[i]);
-    if (r === 'over'){
-      fx('stop'); $('dialog').hidden = true; Sound.amb('none'); Sound.music('none'); Sound.play('over');
-      $('overText').textContent = lastLesson;
-      $('overBtn').textContent = `${state.ch}장 처음부터 다시 하기`;
-      speak('앗, 위험했어요! 다시 해볼까요? ' + lastLesson);
-      await waitButton('over','overBtn');
-      Object.assign(state, saveSnap, {hearts:3});   // 저장한 곳으로 돌아가고 하트 3개
-      drawHearts(); currentBg = '';
-      i = saveIdx; continue;
+let saveSnap = null, saveIdx = 0, topIdx = 0;
+const SAVE_AT = SCRIPT.map((s,i)=>s.t === 'save' ? i : -1).filter(i=>i >= 0);
+async function play(start = 0){
+  const id = runId;
+  let i = start;
+  try {
+    while (i < SCRIPT.length){
+      if (SCRIPT[i].t === 'save') saveIdx = i;
+      topIdx = i; updateProgress();
+      const r = await runStep(SCRIPT[i]); check(id);
+      if (r === 'over'){
+        fx('stop'); $('dialog').hidden = true; Sound.amb('none'); Sound.music('none'); Sound.play('over');
+        $('overText').textContent = lastLesson;
+        $('overBtn').textContent = `${state.ch}장 처음부터 다시 하기`;
+        speak('앗, 위험했어요! 다시 해볼까요? ' + lastLesson);
+        await waitButton('over','overBtn'); check(id);
+        Object.assign(state, saveSnap, {hearts:3});   // 저장한 곳으로 돌아가고 하트 3개
+        drawHearts(); currentBg = '';
+        i = saveIdx; continue;
+      }
+      i++;
     }
-    i++;
-  }
+  } catch (e){ if (e !== ABORT) throw e; }
 }
-let saveIdx = 0;
+
+/* 진행 막대: 8개 장 + 장 안에서 얼마나 왔는지 */
+function updateProgress(){
+  const k = SAVE_AT.indexOf(saveIdx);
+  const end = SAVE_AT[k+1] ?? SCRIPT.length;
+  const inCh = Math.max(0, Math.min(1, (topIdx - saveIdx) / Math.max(1, end - saveIdx)));
+  const total = SAVE_AT.length;
+  $('pfill').style.width = (((k < 0 ? 0 : k) + inCh) / total * 100).toFixed(1) + '%';
+}
+
+/* 아래 버튼들: 뒤로 / 건너뛰기 / 다시 */
+function updateNav(){
+  const target = chap.pos - 1;
+  $('backBtn').disabled = !!ff || target < 0 || target < chap.decLine;
+  $('skipBtn').disabled = !!ff || !$('choices').hidden;
+  $('skipBtn').classList.toggle('on', skipping);
+}
+function rewindTo(stopLine, decisions, hint){
+  abortRun();
+  Object.assign(state, JSON.parse(JSON.stringify(saveSnap)));
+  drawHearts(); fx('stop'); currentBg = '';
+  ff = stopLine == null ? null : { decisions, di: 0, stopLine, hint };
+  updateNav();
+  play(saveIdx);
+}
+function goBack(){
+  if ($('backBtn').disabled) return;
+  rewindTo(chap.pos - 1, chap.decisions.slice(), chap.hint);
+}
+function goSkip(){
+  if ($('skipBtn').disabled) return;
+  skipping = true; updateNav();
+  if (advance){ advance(); if (advance) advance(); }   // 지금 대사도 바로 넘겨요
+}
+function restartChapter(){ $('menu').hidden = true; rewindTo(null); }
+function restartGame(){
+  $('menu').hidden = true; abortRun(); ff = null;
+  Object.assign(state, { hearts: 3, loc: 'sand', lastOk: true, hintUsed: false });
+  drawHearts(); fx('stop'); currentBg = ''; Sound.music('none');
+  play(0);
+}
 
 /* 엔딩: 남은 하트로 칭호, 안전수칙 카드 넘겨보기 */
 function showEnding(){
@@ -1551,6 +1819,13 @@ function showEnding(){
   const sndUi = ()=>{ $('sndBtn').setAttribute('aria-pressed', Sound.on); $('sndLbl').textContent = Sound.on ? '소리 켬' : '소리 끔'; };
   sndUi();
   $('sndBtn').onclick = (e)=>{ e.stopPropagation(); Sound.init(); Sound.setOn(!Sound.on); sndUi(); };
+  // 뒤로 / 건너뛰기 / 다시 버튼
+  $('backBtn').onclick = (e)=>{ e.stopPropagation(); goBack(); };
+  $('skipBtn').onclick = (e)=>{ e.stopPropagation(); goSkip(); };
+  $('restartBtn').onclick = (e)=>{ e.stopPropagation(); $('rsChapter').textContent = `${state.ch}장 처음부터`; $('menu').hidden = false; };
+  $('rsChapter').onclick = restartChapter;
+  $('rsGame').onclick = restartGame;
+  $('rsCancel').onclick = ()=>{ $('menu').hidden = true; };
   $('startForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const name = $('nm').value.replace(/\s/g,'');
@@ -1562,7 +1837,7 @@ function showEnding(){
     Sound.init();   // 효과음은 버튼을 누른 뒤에만 켤 수 있어요
     $('start').hidden = true; $('hud').hidden = false; drawHearts();
     await showCard('t1');
-    play();
+    play(0);
   });
 })();
 </script>
