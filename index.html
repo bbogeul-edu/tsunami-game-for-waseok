@@ -277,7 +277,7 @@ h1 span{color:#7fd3ff}
 
 <!-- 시작 화면 (0장) -->
 <div class="cover" id="start">
-  <div class="ver">v1.1.0</div>
+  <div class="ver">v1.1.1</div>
   <form class="panel" id="startForm" autocomplete="off">
     <div class="kicker">와석초등학교 현장체험학습</div>
     <h1>지진해일에서 <span>살아남기</span></h1>
@@ -947,7 +947,7 @@ const SCRIPT = [
   SAVE(6,'재현아'), BG('stairs'), AMB('roar'), FX('slow'), MUS('tension'),
   N('발이 미끄러진 {이름}의 몸이 뒤로 기우뚱 넘어가요!'),
   S('sw:shock','{이름}아! 내 손!!'),
-  C({id:'6-1', q:'빨리! 5초 안에 골라요!', timer:5, noHint:true, opts:[
+  C({id:'6-1', q:'빨리! 10초 안에 골라요!', timer:10, noHint:true, opts:[
     {ok:true, text:'한 손은 난간을, 한 손은 송화 손을 꽉 잡는다', res:[]},
     {text:'떨어지는 신발을 잡으려고 얼른 손을 뻗는다', res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 물건보다 몸을 지탱할 곳을 먼저 잡아요.'},
     {text:'너무 무서워서 두 눈을 꼭 감고 몸을 웅크린다', res:[SFX('slip'), N('몸이 한 칸 더 미끄러졌어요. 재현이가 아래에서 가까스로 붙잡았어요.')], fb:'위험한 순간엔 눈을 감기보다 몸을 지탱할 곳을 먼저 잡아요.'}
